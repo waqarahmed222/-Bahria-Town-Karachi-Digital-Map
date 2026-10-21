@@ -2,107 +2,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bahria Town Karachi Maps</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f3f6f4;
-      color: #17352a;
-    }
-    header {
-      background: #145b3b;
-      color: white;
-      padding: 22px 16px;
-    }
-    header h1 {
-      font-size: 23px;
-      margin: 0 0 8px;
-    }
-    header p {
-      margin: 0;
-      font-size: 14px;
-    }
-    main {
-      padding: 18px;
-      max-width: 600px;
-      margin: auto;
-    }
-    input, button {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 13px;
-      margin: 7px 0;
-      border: 1px solid #cbd8cf;
-      border-radius: 9px;
-      font-size: 16px;
-    }
-    button {
-      background: #145b3b;
-      color: white;
-      border: none;
-      font-weight: bold;
-    }
-    .panel {
-      background: white;
-      padding: 16px;
-      border-radius: 12px;
-      margin-top: 16px;
-      box-shadow: 0 2px 8px #00000010;
-    }
-    .map {
-      min-height: 180px;
-      background: #e1eadf;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-      text-align: center;
-      padding: 12px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bahria Town Karachi Digital Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f4}
+header{background:#176b43;color:white;padding:18px 12px;text-align:center}
+header h2{margin:0 0 6px}
+main{padding:14px}
+input,button{box-sizing:border-box;width:100%;padding:13px;margin:6px 0;border-radius:7px;font-size:16px}
+input{border:1px solid #aaa}
+button{background:#176b43;color:white;border:0;font-weight:bold}
+#map{height:55vh;min-height:320px;border:1px solid #ccc;border-radius:8px}
+#message{font-size:14px;line-height:1.5}
+footer{text-align:center;padding:14px;color:#555;font-size:12px}
+</style>
 </head>
 <body>
-  <header>
-    <h1>Bahria Town Karachi Maps</h1>
-    <p>Your digital guide to Bahria Town Karachi</p>
-  </header>
-
-  <main>
-    <div class="panel">
-      <h2>Find a Plot or House</h2>
-      <input id="precinct" placeholder="Precinct (e.g. 10A)">
-      <input id="plot" placeholder="Plot or house number">
-      <button onclick="searchPlot()">Search Location</button>
-      <p id="result">Enter a precinct and plot number to begin.</p>
-    </div>
-
-    <div class="panel">
-      <h2>Map Area</h2>
-      <div class="map">
-        <p>Our digital plot map will be added here.<br>
-        Verified maps and locations will come next.</p>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    function searchPlot() {
-      const precinct = document.getElementById('precinct').value.trim();
-      const plot = document.getElementById('plot').value.trim();
-      const result = document.getElementById('result');
-
-      if (!precinct || !plot) {
-        result.textContent = 'Please enter both precinct and plot number.';
-        return;
-      }
-
-      result.textContent =
-        'Search requested: Precinct ' + precinct +
-        ', Plot/House ' + plot +
-        '. Verified map data will be connected in the next step.';
-    }
-  </script>
+<header>
+<h2>Bahria Town Karachi Maps</h2>
+<div>Digital Map Project</div>
+</header>
+<main>
+<label for="precinct">Precinct / Area</label>
+<input id="precinct" placeholder="e.g. Precinct 10A">
+<label for="plot">Plot / House Number</label>
+<input id="plot" placeholder="Enter plot or house number">
+<button onclick="searchLocation()">Search Location</button>
+<p id="message">Map load hone ka intezar karein. Plot search ka data baad mein add hoga.</p>
+<div id="map"></div>
+</main>
+<footer>Community Mapping Project · Bahria Town Karachi</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const map=L.map('map').setView([25.005,67.305],13);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+maxZoom:19,
+attribution:'&copy; OpenStreetMap contributors'
+}).addTo(map);
+function searchLocation(){
+const p=document.getElementById('precinct').value.trim();
+const n=document.getElementById('plot').value.trim();
+if(!p||!n){
+document.getElementById('message').textContent='Please enter both precinct and plot/house number.';
+return;
+}
+document.getElementById('message').textContent='Search: '+p+', Plot/House '+n+'. Verified plot locations abhi add nahi hui hain.';
+}
+</script>
 </body>
 </html>
