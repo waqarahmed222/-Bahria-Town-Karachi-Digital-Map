@@ -37,6 +37,10 @@ footer{text-align:center;padding:14px;color:#555;font-size:12px}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const map=L.map('map').setView([25.005,67.305],13);
+  L.imageOverlay('p1_map_preview.png', [
+  [24.98, 67.28],
+  [25.02, 67.33]
+]).addTo(map);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
 maxZoom:19,
 attribution:'&copy; OpenStreetMap contributors'
