@@ -2,142 +2,194 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bahria Town Karachi Digital Map</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bahria Town Karachi Digital Map</title>
 
-  <link rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+* { box-sizing: border-box; }
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7f4;
-    }
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f1f5f1;
+  color: #222;
+}
 
-    header {
-      background: #14532d;
-      color: white;
-      padding: 16px;
-      text-align: center;
-    }
+header {
+  background: #14532d;
+  color: white;
+  text-align: center;
+  padding: 18px 10px;
+}
 
-    header h2 {
-      margin: 0 0 6px;
-    }
+header h2 {
+  margin: 0 0 6px;
+  font-size: 23px;
+}
 
-    .search {
-      padding: 12px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      background: white;
-    }
+header p {
+  margin: 0;
+  font-size: 14px;
+}
 
-    input, button {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 6px;
-      border: 1px solid #bbb;
-    }
+.search {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+}
 
-    input {
-      flex: 1;
-      min-width: 120px;
-    }
+input {
+  flex: 1;
+  min-width: 125px;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font-size: 16px;
+}
 
-    button {
-      background: #166534;
-      color: white;
-      border: none;
-    }
+button {
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #166534;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
 
-    #map {
-      height: 65vh;
-      min-height: 380px;
-      width: 100%;
-    }
+.tools {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px;
+}
 
-    #message {
-      padding: 12px;
-      background: white;
-      color: #333;
-      font-size: 14px;
-    }
-  </style>
+#status {
+  padding: 10px 12px;
+  font-size: 14px;
+  background: white;
+}
+
+#map-view {
+  width: 100%;
+  height: 65vh;
+  min-height: 350px;
+  overflow: auto;
+  background: #e5e7eb;
+  border-top: 1px solid #ccc;
+  text-align: center;
+}
+
+#map-image {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  transform-origin: top left;
+}
+
+footer {
+  padding: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: #555;
+}
+</style>
 </head>
 
 <body>
-  <header>
-    <h2>Bahria Town Karachi</h2>
-    <div>Digital Map — Precinct 1</div>
-  </header>
 
-  <div class="search">
-    <input id="precinct" placeholder="Precinct (e.g. P1)">
-    <input id="plot" placeholder="Plot or house number">
-    <button onclick="searchPlot()">Search</button>
-  </div>
+<header>
+  <h2>Bahria Town Karachi</h2>
+  <p>Digital Map — Precinct 1</p>
+</header>
 
-  <div id="map"></div>
+<div class="search">
+  <input id="precinct" value="P1"
+         placeholder="Enter precinct">
+  <input id="plot" placeholder="Plot / House number">
+  <button onclick="searchPlot()">Search</button>
+</div>
 
-  <div id="message">
-    Map ready. Precinct 1 image can be switched on from the
-    map layers menu. Plot search will work after plot data is added.
-  </div>
+<div class="tools">
+  <button onclick="zoomIn()">Zoom +</button>
+  <button onclick="zoomOut()">Zoom −</button>
+  <button onclick="resetZoom()">Reset</button>
+</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<div id="status">
+  Loading Precinct 1 map...
+</div>
 
-  <script>
-    const map = L.map('map').setView(
-      [24.99667, 67.30984], 14
-    );
+<div id="map-view">
+  <img id="map-image"
+       src="p1_map_preview.png"
+       alt="Bahria Town Karachi Precinct 1 Map"
+       onload="imageLoaded()"
+       onerror="imageFailed()">
+</div>
 
-    L.tileLayer(
-      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-      {
-        attribution: '&copy; OpenStreetMap contributors',
-        maxZoom: 19
-      }
-    ).addTo(map);
+<footer>
+  Bahria Town Karachi Digital Map
+</footer>
 
-    const precinct1Image = L.imageOverlay(
-      'p1_map_preview.png',
-      [
-        [24.98, 67.28],
-        [25.02, 67.33]
-      ],
-      {
-        opacity: 0.85
-      }
-    );
+<script>
+let zoom = 1;
 
-    L.control.layers(
-      { 'Street Map': map },
-      { 'Precinct 1 Map Image': precinct1Image }
-    ).addTo(map);
+const img = document.getElementById('map-image');
+const statusBox = document.getElementById('status');
 
-    function searchPlot() {
-      const precinct = document
-        .getElementById('precinct').value.trim();
+function imageLoaded() {
+  statusBox.textContent =
+    'Precinct 1 map loaded. Use Zoom buttons to inspect details.';
+}
 
-      const plot = document
-        .getElementById('plot').value.trim();
+function imageFailed() {
+  statusBox.textContent =
+    'Map image not found. Check that p1_map_preview.png ' +
+    'is uploaded beside index.html in the repository.';
+}
 
-      const message = document.getElementById('message');
+function applyZoom() {
+  img.style.width = (100 * zoom) + '%';
+}
 
-      if (!precinct || !plot) {
-        message.textContent =
-          'Please enter both precinct and plot number.';
-        return;
-      }
+function zoomIn() {
+  zoom = Math.min(zoom + 0.25, 4);
+  applyZoom();
+}
 
-      message.textContent =
-        'Plot database abhi add nahi hui. ' +
-        'Search: ' + precinct + ', Plot ' + plot +
-        '. Is plot ki verified location data add karna baqi hai.';
-    }
-  </script>
+function zoomOut() {
+  zoom = Math.max(zoom - 0.25, 0.5);
+  applyZoom();
+}
+
+function resetZoom() {
+  zoom = 1;
+  applyZoom();
+}
+
+function searchPlot() {
+  const precinct =
+    document.getElementById('precinct').value.trim();
+  const plot =
+    document.getElementById('plot').value.trim();
+
+  if (!precinct || !plot) {
+    statusBox.textContent =
+      'Please enter a precinct and plot/house number.';
+    return;
+  }
+
+  statusBox.textContent =
+    'Search requested: ' + precinct + ', Plot/House ' + plot +
+    '. Exact plot search will be enabled after verified plot data is added.';
+}
+</script>
+
 </body>
 </html>
